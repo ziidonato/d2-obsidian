@@ -12,6 +12,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@d2js/types": "^2.15.8-rc.2",
     "@types/lodash.debounce": "^4.0.7",
     "@types/node": "^16.11.6",
     "@typescript-eslint/eslint-plugin": "5.29.0",

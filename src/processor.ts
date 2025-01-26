@@ -2,6 +2,9 @@ import { MarkdownPostProcessorContext, ButtonComponent } from "obsidian";
 import { delimiter } from "path";
 import debounce from "lodash.debounce";
 import D2Plugin from "./main";
+import { D2 } from "@terrastruct/d2";
+//import os from "os";
+//import { exec, execSync } from "child_process";
 
 export class D2Processor {
   plugin: D2Plugin;
@@ -277,8 +280,6 @@ export class D2Processor {
   }
 
   async generatePreviewMobile(source: string): Promise<string> {
-    // @ts-ignore
-    const { D2 } = await import("@terrastruct/d2");
     const d2 = new D2();
 
     const result = await d2.compile(source, {

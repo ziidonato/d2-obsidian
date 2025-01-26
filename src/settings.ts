@@ -12,6 +12,7 @@ export interface D2PluginSettings {
   pad: number;
   sketch: boolean;
   containerHeight: number;
+  usePCRenderer: boolean;
 }
 
 export const DEFAULT_SETTINGS: D2PluginSettings = {
@@ -23,6 +24,7 @@ export const DEFAULT_SETTINGS: D2PluginSettings = {
   pad: 100,
   sketch: false,
   containerHeight: 800,
+  usePCRenderer: false,
 };
 
 export class D2SettingsTab extends PluginSettingTab {
@@ -42,13 +44,15 @@ export class D2SettingsTab extends PluginSettingTab {
     new Setting(talaSettings)
       .setName("API token")
       .setDesc(
-        'To use TALA, copy your API token here or in ~/.local/state/tstruct/auth.json under the field "api_token"'
+        'To use TALA, copy your API token here or in ~/.local/state/tstruct/auth.json under the field "api_token"',
       )
       .addText((text) =>
         text
           .setPlaceholder("tstruct_...")
           .setValue(this.plugin.settings.apiToken)
-          .setDisabled(this.plugin.settings.layoutEngine !== LAYOUT_ENGINES.TALA.value)
+          .setDisabled(
+            this.plugin.settings.layoutEngine !== LAYOUT_ENGINES.TALA.value,
+          )
           .onChange(async (value) => {
             if (value && !value.startsWith("tstruct_")) {
               new Notice("Invalid API token");
@@ -56,7 +60,7 @@ export class D2SettingsTab extends PluginSettingTab {
               this.plugin.settings.apiToken = value;
               await this.plugin.saveSettings();
             }
-          })
+          }),
       );
 
     this.talaSettings = talaSettings;
@@ -70,7 +74,7 @@ export class D2SettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Layout engine")
       .setDesc(
-        'Available layout engines include "dagre", "ELK", and "TALA" (TALA must be installed separately from D2)'
+        'Available layout engines include "dagre", "ELK", and "TALA" (TALA must be installed separately from D2)',
       )
       .addDropdown((dropdown) => {
         dropdown
@@ -92,25 +96,29 @@ export class D2SettingsTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("Theme ID")
       .setDesc(
-        "Available themes are located at https://github.com/terrastruct/d2/tree/master/d2themes"
+        "Available themes are located at https://github.com/terrastruct/d2/tree/master/d2themes",
       )
       .addText((text) =>
         text
-          .setPlaceholder("Enter a theme ID")
+          .setPlaceholder("Enter a theme ID (Only works with PC Render)")
           .setValue(String(this.plugin.settings.theme))
           .onChange(async (value) => {
             if (!isNaN(Number(value)) || value === "") {
-              this.plugin.settings.theme = Number(value || DEFAULT_SETTINGS.theme);
+              this.plugin.settings.theme = Number(
+                value || DEFAULT_SETTINGS.theme,
+              );
               await this.plugin.saveSettings();
             } else {
               new Notice("Please specify a valid number");
             }
-          })
+          }),
       );
 
     new Setting(containerEl)
       .setName("Pad")
-      .setDesc("Pixels padded around the rendered diagram")
+      .setDesc(
+        "Pixels padded around the rendered diagram (Only works with PC Render)",
+      )
       .addText((text) =>
         text
           .setPlaceholder(String(DEFAULT_SETTINGS.pad))
@@ -125,7 +133,7 @@ export class D2SettingsTab extends PluginSettingTab {
               this.plugin.settings.pad = Number(value);
             }
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
@@ -135,12 +143,14 @@ export class D2SettingsTab extends PluginSettingTab {
         toggle.setValue(this.plugin.settings.sketch).onChange(async (value) => {
           this.plugin.settings.sketch = value;
           await this.plugin.saveSettings();
-        })
+        }),
       );
 
     new Setting(containerEl)
       .setName("Container height")
-      .setDesc("Diagram max render height in pixels (Requires d2 v0.2.2 and up)")
+      .setDesc(
+        "Diagram max render height in pixels (Requires d2 v0.2.2 and up)",
+      )
       .addText((text) =>
         text
           .setPlaceholder(String(DEFAULT_SETTINGS.containerHeight))
@@ -149,17 +159,17 @@ export class D2SettingsTab extends PluginSettingTab {
             if (isNaN(Number(value))) {
               new Notice("Please specify a valid number");
               this.plugin.settings.containerHeight = Number(
-                DEFAULT_SETTINGS.containerHeight
+                DEFAULT_SETTINGS.containerHeight,
               );
             } else if (value === "") {
               this.plugin.settings.containerHeight = Number(
-                DEFAULT_SETTINGS.containerHeight
+                DEFAULT_SETTINGS.containerHeight,
               );
             } else {
               this.plugin.settings.containerHeight = Number(value);
             }
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
@@ -182,13 +192,13 @@ export class D2SettingsTab extends PluginSettingTab {
               this.plugin.settings.debounce = Number(value);
             }
             await this.plugin.saveSettings();
-          })
+          }),
       );
 
     new Setting(containerEl)
       .setName("Path (optional)")
       .setDesc(
-        "Customize the local path to the directory `d2` is installed in (ex. if d2 is located at `/usr/local/bin/d2`, then the path is `/usr/local/bin`). This is only necessary if `d2` is not found automatically by the plugin (but is installed)."
+        "Customize the local path to the directory `d2` is installed in (ex. if d2 is located at `/usr/local/bin/d2`, then the path is `/usr/local/bin`). This is only necessary if `d2` is not found automatically by the plugin (but is installed).",
       )
       .addText((text) => {
         text
@@ -199,6 +209,18 @@ export class D2SettingsTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
       });
+
+    new Setting(containerEl)
+      .setName("Use PC Renderer")
+      .setDesc("Use the PC renderer for D2 (requires PC)")
+      .addToggle((toggle) =>
+        toggle
+          .setValue(this.plugin.settings.usePCRenderer)
+          .onChange(async (value) => {
+            this.plugin.settings.usePCRenderer = value;
+            await this.plugin.saveSettings();
+          }),
+      );
 
     if (this.plugin.settings.layoutEngine === LAYOUT_ENGINES.TALA.value) {
       this.addTALASettings();

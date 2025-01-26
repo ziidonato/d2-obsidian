@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "baseUrl": ".",
     "inlineSourceMap": true,
     "inlineSources": true,
@@ -11,16 +12,8 @@
     "importHelpers": true,
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
-	"strictNullChecks": true,
-    "lib": [
-      "ES2021",
-      "DOM",
-      "ES5",
-      "ES6",
-      "ES7",
-    ]
+    "strictNullChecks": true,
+    "lib": ["ES2021", "DOM", "ES5", "ES6", "ES7"]
   },
-  "include": [
-    "**/*.ts"
-  ]
+  "include": ["**/*.ts"]
 }

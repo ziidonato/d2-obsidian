@@ -2,9 +2,8 @@ import { MarkdownPostProcessorContext, ButtonComponent } from "obsidian";
 import { exec, execSync } from "child_process";
 import { delimiter } from "path";
 import debounce from "lodash.debounce";
-import os from "os";
-
 import D2Plugin from "./main";
+import 
 
 export class D2Processor {
   plugin: D2Plugin;
@@ -168,7 +167,13 @@ export class D2Processor {
     }
   };
 
-  async generatePreview(source: string, signal?: AbortSignal): Promise<string> {
+  async generatePreviewPC(source: string, signal?: AbortSignal): Promise<string> {
+    const os = await import("os").then((os) => os.default);
+    const exec = await import("child_process")
+      .then((child_process) => child_process.default.exec);
+    const execSync = await import("child_process")
+    .then((child_process) => child_process.default.execSync);
+    
     const pathArray = [process.env.PATH, "/opt/homebrew/bin", "/usr/local/bin"];
 
     // platform will be win32 even on 64 bit windows
@@ -262,4 +267,22 @@ export class D2Processor {
       });
     });
   }
+
+  async generatePreviewMobile(source: string): Promise<string> {
+    const D2 = await import("@terrastruct/d2").then((d2) => d2.default);
+    const d2 = new D2()
+
+    const result = d2.compile(source, {layout: this.plugin.settings.layoutEngine, sketch: this.plugin.settings.sketch })
+    const svg = await d2.render(result.diagram, {sketch: this.plugin.settings.sketch })
+    return svg;
+  }
+
+  async generatePreview(source: string, signal?: AbortSignal): Promise<string> {
+    if (this.plugin.settings.usePCRenderer) {
+      return this.generatePreviewPC(source, signal);
+    } else {
+      return this.generatePreviewMobile(source);
+    }
+  }
 }
+

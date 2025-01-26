@@ -277,7 +277,7 @@ export class D2Processor {
 
   async generatePreviewMobile(source: string): Promise<string> {
     // @ts-ignore
-    const D2 = await import("@terrastruct/d2").then((d2) => d2.default);
+    const D2 = await import("@terrastruct/d2").then((d2) => d2.default.D2);
     const d2 = new D2();
 
     const result = await d2.compile(source, {
